@@ -1,0 +1,61 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "b03e9a416484862a1a812f897ce9514c",
+    "packages": [
+        {
+            "name": "ksoftm/utility",
+            "version": "0.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/KsoftM/Utility.git",
+                "reference": "d6f08bd66fa62b89a4f6f13cd79b8f8057b2bdbe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/KsoftM/Utility/zipball/d6f08bd66fa62b89a4f6f13cd79b8f8057b2bdbe",
+                "reference": "d6f08bd66fa62b89a4f6f13cd79b8f8057b2bdbe",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ksoftm\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "KsoftM",
+                    "email": "ksoftmanagement@gmail.com"
+                }
+            ],
+            "description": "Some utility helpers for PHP.",
+            "support": {
+                "issues": "https://github.com/KsoftM/Utility/issues",
+                "source": "https://github.com/KsoftM/Utility/tree/v0.0.3-stable"
+            },
+            "time": "2021-09-07T06:22:11+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": "^8.0"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "2.1.0"
+}

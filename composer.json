@@ -1,0 +1,23 @@
+{
+    "name": "ksoftm/routing-system",
+    "description": "Routing system for PHP projects.",
+    "type": "project",
+    "require": {
+        "php": "^8.0",
+        "ksoftm/utility": "^0.0.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "KsoftM",
+            "email": "ksoftmanagement@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "ksoftm\\": "./src"
+        }
+    },
+    "version": "0.0.1"
+}
