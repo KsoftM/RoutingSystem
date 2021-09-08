@@ -54,4 +54,15 @@ class Request
 
         return $tmp ?? false;
     }
+
+    public function userRouterData(): array|false
+    {
+        $r = Router::resolve();
+
+        if ($r != false) {
+            return $r->getUserPathData();
+        }
+
+        return false;
+    }
 }

@@ -19,6 +19,9 @@ class Rout
     /** @var mixed $callback callback of the rout. */
     protected mixed $callback = null;
 
+    /** @var array $callback user rout data. */
+    protected ?array $data = null;
+
     /**
      * class construct
      *
@@ -96,6 +99,16 @@ class Rout
      */
     public function getCallback(): mixed
     {
-        return $this->callbacks;
+        return $this->callback;
+    }
+
+    public function setUserPathData(array $data): void
+    {
+        $this->data = $data;
+    }
+
+    public function getUserPathData(): array|false
+    {
+        return empty($this->data) ? false : $this->data;
     }
 }

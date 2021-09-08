@@ -58,6 +58,8 @@ class Router
      * 
      * compare routers to match the path
      * 
+     * preg_match('/[\/]user\/(.*)\/profile\/edit\/slug[\/](.*)/', $input_line, $output_array);
+     * 
      */
 
 
@@ -107,7 +109,7 @@ class Router
         return null;
     }
 
-    public static function resolve()
+    public static function resolve(): Rout|false
     {
         $url = filter_var(
             parse_url(
@@ -117,23 +119,42 @@ class Router
             FILTER_SANITIZE_URL
         );
 
-
-
         foreach (self::$argus as $arKey => $arValue) {
             if ($arValue instanceof Rout) {
-                $path = explode('/', $arValue->getPath());
-                foreach ($path as $key => $value) {
-                    if (!empty($value) && !empty($arValue)) {
-                        echo '<pre>';
-                        var_dump($value, $arValue->getPath());
-                        echo '</pre>';
+                $path = $arValue->getPath();
+
+                if (preg_match_all('/[\/.*]*[{][.*]*([^}]*)[}][\/.*]*/miU', $path, $output_array)) {
+                    $format = "$path/";
+                    foreach ($output_array[1] as $key => $value) {
+                        $format = str_replace(sprintf("{%s}", $value), '(.*)', $format);
+                    }
+                    $format = str_replace('/', '\/', $format);
+                    $format = sprintf("/%s/miU", $format);
+
+
+                    if (preg_match_all($format, "$url/", $out)) {
+
+                        array_shift($out);
+
+                        $data = [];
+                        array_map(
+                            function ($key, $value) use (&$data) {
+                                $data += [$key => $value[0]];
+                            },
+                            $output_array[1],
+                            $out
+                        );
+                        $arValue->setUserPathData($data);
+                        return $arValue;
+                    }
+                } else {
+                    if ($url == $path) {
+                        return $arValue;
                     }
                 }
             }
         }
-        echo '<pre>';
-        // var_dump($url);
-        echo '</pre>';
-        exit;
+
+        return false;
     }
 }
