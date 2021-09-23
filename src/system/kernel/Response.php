@@ -1,15 +1,16 @@
 <?php
 
-namespace ksoftm\system\core;
+namespace ksoftm\system\kernel;
 
-use ksoftm\utils\EndeCorder;
-use ksoftm\utils\html\BuildMixer;
-use ksoftm\utils\html\Mixer;
+use ksoftm\system\utils\Cookie;
+use ksoftm\system\utils\EndeCorder;
 
 class Response
 {
     /** @var string static $cookieKey cookie encrypting key. */
     protected static ?string $cookieKey = null;
+
+    protected ?Cookie $data = null;
 
     // return response($content)->header('Content-Type', $type)
     // ->cookie('name', 'value', $minutes);
@@ -46,6 +47,13 @@ class Response
         }
     }
 
+    /**
+     * get and set cookie key
+     *
+     * @param string|null $key
+     *
+     * @return string|false
+     */
     public static function CookieKey(string $key = null): string|false
     {
         if (!empty($key)) {
@@ -83,22 +91,18 @@ class Response
     public function cookie(
         string $name,
         string $value = null,
-        int $minutes = 10
+        int $minutes = 10,
+        string|bool $encryptKey = false
     ): Response {
-        $data = EndeCorder::SSLEncryption(
-            $value,
-            self::CookieKey()
-        );
 
-        setcookie(
-            $name,
-            $data,
-            time() + (60 * $minutes),
-            '\\',
-            '',
-            true,
-            true
-        );
+        $this->data = Cookie::make($name, $value, $minutes);
+
+        if ($encryptKey != false) {
+            self::CookieKey($encryptKey);
+            $this->data->encrypted(self::CookieKey());
+        }
+
+        $this->data->start();
 
         return $this;
     }
@@ -115,5 +119,42 @@ class Response
         $this->header('Content-type', "application/json; charset=$charset");
 
         return $this;
+    }
+
+    public function download(string $filePath): void
+    { //<<----------->> download system <<----------->>//
+
+        if (file_exists($filePath)) {
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Cache-Control: no-cash, must-revalidate");
+
+            // header("Expires: " . date("D, d M Y H:i:s", time() + 5));
+            header("Expires: 0");
+
+            header("Content-Disposition: attachment; filename=" . pathinfo($filePath, PATHINFO_BASENAME));
+            header("Content-Type: application/" . pathinfo($filePath, PATHINFO_EXTENSION));
+            // header("Content-Type: application/octet-stream");
+            header("Content-Length: " . filesize($filePath));
+
+            header("Content-Transfer-Encoding: binary");
+            ob_clean();
+
+            $ctx = stream_context_create();
+
+            if (false !== ($fRes = fopen($filePath, 'r', false, $ctx))) {
+
+                while (false !== ($d = stream_get_contents($fRes, 512 * 1024, 512 * 1024))) {
+                    echo $d;
+                }
+            }
+
+            exit;
+        } else {
+            // return view('errors._fileNotFound');
+        }
+
+        //<<-----X----->> download system <<-----X----->>//
+
     }
 }

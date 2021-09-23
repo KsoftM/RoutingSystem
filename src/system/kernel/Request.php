@@ -1,8 +1,18 @@
 <?php
 
-namespace ksoftm\system\core;
+namespace ksoftm\system\kernel;
 
+/*
+    future updates
 
+    $request->cookie('key', 'default');
+    $request->file('key', 'default');
+
+*/
+
+/**
+ * Request class
+ */
 class Request
 {
     public function getMethodData(string $method = Router::GET_METHOD): array|false
@@ -19,10 +29,7 @@ class Request
     }
 
 
-    // $request->cookie('key', 'default');
-    // $request->except($keys);
-    // $request->exists('key');
-    // $request->file('key', 'default');
+
 
     public function exists(string $key): bool
     {

@@ -1,9 +1,9 @@
 <?php
 
-namespace ksoftm\system\core;
+namespace ksoftm\system\kernel;
 
 use Closure;
-use ksoftm\system\core\Rout;
+use ksoftm\system\internal\Rout;
 
 class Router
 {
@@ -156,5 +156,38 @@ class Router
         }
 
         return false;
+    }
+
+    /**
+     * get the real path of a specific path
+     *
+     * @param string $name name of the rout
+     * @param array $data data must be in left ot right order regarding the rout.
+     *
+     * @return string|false
+     */
+    public static function realPath(string $name, array $data = null): string|false
+    {
+        $path = self::getPathByName($name);
+
+        if (preg_match_all(
+            '/[\/.*]*[{][.*]*([^}]*)[}][\/.*]*/miU',
+            $path,
+            $matches
+        )) {
+            if (!empty($data)) {
+                return false;
+            }
+            $path = "$path/";
+            foreach ($matches[1] as $value) {
+                $path = str_replace(sprintf("{%s}", $value), '%s', $path);
+            }
+
+            foreach ($data as $value) {
+                $path = implode($value, explode('%s', $path, 2));
+            }
+        }
+
+        return $path;
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace ksoftm\system\core;
+namespace ksoftm\system\internal;
 
 use Exception;
+use ksoftm\system\kernel\Router;
 
 class Rout
 {
