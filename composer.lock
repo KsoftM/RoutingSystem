@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f34b635a3569daa9f9807fbe917275f0",
+    "content-hash": "7fe9f0d18bdfb9307d396d91bf1fed8d",
     "packages": [
         {
             "name": "ksoftm/utility",
-            "version": "0.0.7",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KsoftM/Utility.git",
-                "reference": "921fce735eac900aa3ef028573912fc8911200ad"
+                "reference": "0c526be0f728e9b50876df05df750dde5dc47011"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KsoftM/Utility/zipball/921fce735eac900aa3ef028573912fc8911200ad",
-                "reference": "921fce735eac900aa3ef028573912fc8911200ad",
+                "url": "https://api.github.com/repos/KsoftM/Utility/zipball/0c526be0f728e9b50876df05df750dde5dc47011",
+                "reference": "0c526be0f728e9b50876df05df750dde5dc47011",
                 "shasum": ""
             },
             "require": {
@@ -26,7 +26,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "ksoftm\\": "./src"
+                    "ksoftm\\system\\": "./src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -42,14 +42,14 @@
             "description": "Some utility helpers for PHP.",
             "support": {
                 "issues": "https://github.com/KsoftM/Utility/issues",
-                "source": "https://github.com/KsoftM/Utility/tree/v0.0.7-stable"
+                "source": "https://github.com/KsoftM/Utility/tree/v0.1.0-stable"
             },
-            "time": "2021-09-18T09:26:55+00:00"
+            "time": "2021-09-23T03:42:38+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,

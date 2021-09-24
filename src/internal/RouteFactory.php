@@ -2,10 +2,11 @@
 
 namespace ksoftm\system\internal;
 
+use Closure;
 use Exception;
-use ksoftm\system\kernel\Router;
+use ksoftm\system\kernel\Route;
 
-class Rout
+class RouteFactory
 {
 
     /** @var string $name name of the property. */
@@ -17,8 +18,8 @@ class Rout
     /** @var string $path path of the rout. */
     protected ?string $path = null;
 
-    /** @var mixed $callback callback of the rout. */
-    protected mixed $callback = null;
+    /** @var Closure $callback callback of the rout. */
+    protected ?Closure $callback = null;
 
     /** @var array $callback user rout data. */
     protected ?array $data = null;
@@ -27,14 +28,19 @@ class Rout
      * class construct
      *
      * @param string $routPath
-     * @param mixed $callback
+     * @param Closure $callback
      * @param string $name
      */
-    public function __construct(string $path, mixed $callback, string $method)
+    protected function __construct(string $path, Closure $callback, string $method)
     {
         $this->path = $path;
         $this->callback = $callback;
         $this->method = $method;
+    }
+
+    public static function new(string $path, Closure $callback, string $method): RouteFactory
+    {
+        return new RouteFactory($path, $callback, $method);
     }
 
     /**
@@ -42,15 +48,17 @@ class Rout
      *
      * @param string $name
      *
-     * @return void
+     * @return RouteFactory
      */
-    public function name(string $name): void
+    public function name(string $name): RouteFactory
     {
-        if (preg_match('/^[^0-9][a-z0-9-]+$/', $name)) {
+        if (preg_match('/^[^0-9][a-z0-9-.]+$/', $name)) {
             $this->name = $name;
         } else {
             throw new Exception("$name . ' is not a valid name.");
         }
+
+        return $this;
     }
 
     /**
@@ -64,13 +72,29 @@ class Rout
     }
 
     /**
+     * return the route method
+     *
+     * @return string
+     */
+    public function getMethod(): ?string
+    {
+        return $this->method;
+    }
+
+    public function middleware(string $middleware): RouteFactory
+    {
+
+        return $this;
+    }
+
+    /**
      * check this Rout is post method
      *
      * @return boolean
      */
     public function isPost(): bool
     {
-        return $this->method == Router::POST_METHOD ? true : false;
+        return (strtolower($this->method) == strtolower(filter_input(INPUT_SERVER, 'REQUEST_METHOD')) && strtolower($this->method) == Route::POST_METHOD) ? true : false;
     }
 
     /**
@@ -80,7 +104,7 @@ class Rout
      */
     public function isGet(): bool
     {
-        return $this->method == Router::GET_METHOD ? true : false;
+        return (strtolower($this->method) == strtolower(filter_input(INPUT_SERVER, 'REQUEST_METHOD')) && strtolower($this->method) == Route::GET_METHOD) ? true : false;
     }
 
     /**
@@ -96,11 +120,11 @@ class Rout
     /**
      * get the callback of the rout
      *
-     * @return mixed
+     * @return Closure|false
      */
-    public function getCallback(): mixed
+    public function getCallback(): Closure|false
     {
-        return $this->callback;
+        return $this->callback ?? false;
     }
 
     public function setUserPathData(array $data): void

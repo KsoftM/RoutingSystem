@@ -3,41 +3,22 @@
 namespace ksoftm\system\kernel;
 
 use Closure;
-use ksoftm\system\internal\Rout;
+use ksoftm\system\internal\RouteFactory;
+use ksoftm\system\utils\html\Mixer;
+use ksoftm\system\utils\SingletonFactory;
+use ReflectionObject;
 
-class Router
+class Route
 {
+
     /** @var string GET_METHOD get method of the rout. */
     public const GET_METHOD = 'get';
 
     /** @var string POST_METHOD post method of the rout. */
-    public const POST_METHOD = 'get';
+    public const POST_METHOD = 'post';
 
     /** @var array $argus routing list. */
     protected static $argus = [];
-    /*
-
-[
-    get => [
-        '/update/011/' => ' updated!'
-    ]
-]
-
-[
-    get => [
-        'rout' => [
-            'path' =>'/update/011/s',
-            'callback'  =>' updated!'
-        ]
-        0 => [
-            'path' =>'/update/011/s',
-            'callback'  =>' updated!'
-        ]
-    ]
-]
-
-
- */
 
     /**
      * example Paths
@@ -63,28 +44,26 @@ class Router
      */
 
 
-    public static function post(string $rout, mixed $callable): Rout
+    public static function post(string $rout, Closure $callable): RouteFactory
     {
-        $tmp = new Rout(
+        $tmp = RouteFactory::new(
             $rout,
             $callable,
-            Router::POST_METHOD
+            Route::POST_METHOD
         );
-        self::$argus[] = $tmp;
 
-        return $tmp;
+        return self::$argus[] = $tmp;
     }
 
-    public static function get(string $rout, mixed $callable): Rout
+    public static function get(string $rout, Closure $callable): RouteFactory
     {
-        $tmp = new Rout(
+        $tmp = RouteFactory::new(
             $rout,
             $callable,
-            Router::GET_METHOD
+            Route::GET_METHOD
         );
-        self::$argus[] = $tmp;
 
-        return $tmp;
+        return self::$argus[] = $tmp;
     }
 
     public static function getPathByName(string $name): ?string
@@ -97,10 +76,10 @@ class Router
         return null;
     }
 
-    public static function getRoutByName(string $name): ?Rout
+    public static function getRoutByName(string $name): ?RouteFactory
     {
         foreach (self::$argus as $key => $value) {
-            if ($value instanceof Rout) {
+            if ($value instanceof RouteFactory) {
                 if (!empty($value->getName()) && $value->getName() == $name) {
                     return self::$argus[$key];
                 }
@@ -109,18 +88,59 @@ class Router
         return null;
     }
 
-    public static function resolve(): Rout|false
+    public static function build(): mixed
     {
-        $url = filter_var(
+        $r = Route::resolve();
+
+        if ($r != false) {
+            $callable = $r->getCallback();
+
+            $call = new ReflectionObject($callable);
+
+            $params = [];
+            foreach ($call->getMethod('__invoke')->getParameters() as $key => $value) {
+                if ($value->hasType()) {
+                    $param = $value->getType()->getName();
+
+                    if (isset(class_parents($param)[SingletonFactory::class])) {
+                        $params[] = $param::getInstance();
+                    }
+                }
+            }
+
+            if (is_callable($callable)) {
+                $data = call_user_func_array($callable, $params);
+                if (
+                    is_object($data) ||
+                    is_array($data)
+                ) {
+                    return $data;
+                } else {
+                    echo $data;
+                    return true;
+                }
+            }
+        } else {
+            Response::centeredMessage('Rout not found..!');
+            return false;
+        }
+
+        return false;
+    }
+
+    public static function resolve(): RouteFactory|false
+    {
+        $url = rtrim(filter_var(
             parse_url(
                 filter_input(INPUT_SERVER, 'REQUEST_URI'),
                 PHP_URL_PATH
             ),
             FILTER_SANITIZE_URL
-        );
+        ), '/') ?: '/';
+
 
         foreach (self::$argus as $arKey => $arValue) {
-            if ($arValue instanceof Rout) {
+            if ($arValue instanceof RouteFactory && ($arValue->isGet() || $arValue->isPost())) {
                 $path = $arValue->getPath();
 
                 if (preg_match_all('/[\/.*]*[{][.*]*([^}]*)[}][\/.*]*/miU', $path, $output_array)) {
@@ -175,19 +195,17 @@ class Router
             $path,
             $matches
         )) {
-            if (!empty($data)) {
+            if (empty($data)) {
                 return false;
             }
             $path = "$path/";
             foreach ($matches[1] as $value) {
                 $path = str_replace(sprintf("{%s}", $value), '%s', $path);
             }
-
             foreach ($data as $value) {
                 $path = implode($value, explode('%s', $path, 2));
             }
         }
-
         return $path;
     }
 }
