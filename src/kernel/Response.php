@@ -132,7 +132,8 @@ class Response extends SingletonFactory
                 "Cache-Control: public",
                 "Content-Description: File Transfer",
                 "Cache-Control: no-cash, must-revalidate",
-                "Expires: 0",
+		//Expires: Thu, 19 Nov 1981 08:52:00 GMT
+                // "Expires: 0",
                 "Content-Disposition: attachment; filename=" . pathinfo($filePath, PATHINFO_BASENAME),
                 // "Content-Type: application/octet-stream",
                 "Content-Type: application/" . pathinfo($filePath, PATHINFO_EXTENSION) ?? 'docx',

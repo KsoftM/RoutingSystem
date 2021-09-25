@@ -1,7 +1,7 @@
 {
     "name": "ksoftm/routing-system",
     "description": "Routing system for PHP projects.",
-    "type": "project",
+    "type": "library",
     "require": {
         "php": "^8.0",
         "ksoftm/utility": "0.1.0"
@@ -16,9 +16,8 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "ksoftm\\system\\": "./src",
-            "ksoftm\\system\\internal\\": "./src/internal"
+            "ksoftm\\system\\": "./src"
         }
     },
-    "version": "0.1.0"
+    "version": "0.1.1"
 }
