@@ -55,7 +55,7 @@ class RouteFactory
         if (preg_match('/^[^0-9][a-z0-9-.]+$/', $name)) {
             $this->name = $name;
         } else {
-            throw new Exception("$name . ' is not a valid name.");
+            throw new Exception("$name is not a valid name.");
         }
 
         return $this;
