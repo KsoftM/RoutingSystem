@@ -1,10 +1,11 @@
 <?php
 
-namespace KsoftM\system\middleware;
+namespace ksoftm\system\middleware;
 
 use Closure;
+use ksoftm\system\kernel\Request;
 
 interface MiddlewareFactory
 {
-    function handle($request, Closure $next): mixed;
+    function handle(Request $request, Closure $next): mixed;
 }

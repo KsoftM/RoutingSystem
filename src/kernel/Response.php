@@ -3,11 +3,16 @@
 namespace ksoftm\system\kernel;
 
 use ksoftm\system\utils\Cookie;
-use ksoftm\system\utils\EndeCorder;
 use ksoftm\system\utils\SingletonFactory;
 
 class Response extends SingletonFactory
 {
+
+    /** @var string static $cookieKey cookie encrypting key. */
+    protected static ?string $cookieKey = null;
+
+    protected ?Cookie $data = null;
+
     protected static ?self $instance = null;
     public static function getInstance(): self
     {
@@ -17,10 +22,10 @@ class Response extends SingletonFactory
         return self::$instance;
     }
 
-    /** @var string static $cookieKey cookie encrypting key. */
-    protected static ?string $cookieKey = null;
-
-    protected ?Cookie $data = null;
+    public static function redirect($routName): void
+    {
+        Redirect::next($routName);
+    }
 
     /**
      * Class constructor.
@@ -37,10 +42,10 @@ class Response extends SingletonFactory
             echo $contents;
         }
 
-        http_response_code($responseCode);
+        $this->setStateCode($responseCode);
 
         if (!empty($headers)) {
-            $this->withHeader($headers);
+            $this->acceptHtml()->withHeader($headers);
         }
     }
 
@@ -68,6 +73,11 @@ class Response extends SingletonFactory
         return new Response($contents, $responseCode, $headers);
     }
 
+    public function setStateCode(int $code): Response
+    {
+        http_response_code($code);
+        return $this;
+    }
 
     public function header(string $attribute, string $value = null): Response
     {
@@ -132,7 +142,7 @@ class Response extends SingletonFactory
                 "Cache-Control: public",
                 "Content-Description: File Transfer",
                 "Cache-Control: no-cash, must-revalidate",
-		//Expires: Thu, 19 Nov 1981 08:52:00 GMT
+                //Expires: Thu, 19 Nov 1981 08:52:00 GMT
                 // "Expires: 0",
                 "Content-Disposition: attachment; filename=" . pathinfo($filePath, PATHINFO_BASENAME),
                 // "Content-Type: application/octet-stream",

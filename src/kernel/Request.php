@@ -33,7 +33,7 @@ class Request extends SingletonFactory
 
         foreach ($data as $key => $value) {
             $key = filter_var($key, FILTER_SANITIZE_SPECIAL_CHARS);
-            $tmp[$key] = filter_input($method, $value, FILTER_SANITIZE_SPECIAL_CHARS);
+            $tmp[$key] = filter_input($method, $key, FILTER_SANITIZE_SPECIAL_CHARS);
         }
 
         return $tmp ?? false;
@@ -41,16 +41,20 @@ class Request extends SingletonFactory
 
     public function exists(string $key): bool
     {
-        return $this->except([$key]) == false ? false : true;
+        return  is_array($this->except([$key])) && $this->except([$key]) != false ? true : false;
     }
 
-    public function except(array $keys): array
+    public function except(array $keys): array|false
     {
         $data = $this->getAll();
 
-        foreach ($keys as $eKey) {
-            if (array_key_exists($eKey, $data)) {
-                $tmp[$eKey] = $data[$eKey];
+        if ($data != false && !empty($data)) {
+            $tmp = null;
+
+            foreach ($keys as $eKey) {
+                if (array_key_exists($eKey, $data)) {
+                    $tmp[$eKey] = $data[$eKey];
+                }
             }
         }
 
@@ -59,17 +63,22 @@ class Request extends SingletonFactory
 
     public function getAll(): array|false
     {
-        $output[] = $this->getMethodData();
-        $output[] = $this->getMethodData(Route::POST_METHOD);
-        $output[] = $_SESSION;
-        $output[] = $_FILES;
+        if (session_status() != PHP_SESSION_ACTIVE) {
+            session_start();
+        }
 
-        foreach (array_merge($_COOKIE, $_SESSION, $_FILES) as $key => $value) {
+        $output = array_merge(
+            $_GET,
+            $_POST,
+            $_COOKIE,
+            $_SESSION,
+            $_FILES
+        );
+
+        foreach ($output as $key => $value) {
             $key = filter_var($key, FILTER_SANITIZE_SPECIAL_CHARS);
             $tmp[$key] = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
         }
-
-        $output = $tmp;
 
         return $tmp ?? false;
     }

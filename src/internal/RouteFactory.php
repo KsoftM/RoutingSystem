@@ -4,7 +4,10 @@ namespace ksoftm\system\internal;
 
 use Closure;
 use Exception;
+use ksoftm\system\kernel\Request;
 use ksoftm\system\kernel\Route;
+use ksoftm\system\middleware\MiddlewareFactory;
+use ksoftm\system\middleware\MiddlewareStake;
 
 class RouteFactory
 {
@@ -20,6 +23,9 @@ class RouteFactory
 
     /** @var Closure $callback callback of the rout. */
     protected ?Closure $callback = null;
+
+    /** @var array $middleware middleware of the rout. */
+    protected ?array $middleware = null;
 
     /** @var array $callback user rout data. */
     protected ?array $data = null;
@@ -81,11 +87,28 @@ class RouteFactory
         return $this->method;
     }
 
-    public function middleware(string $middleware): RouteFactory
+    public function middleware(array $middleware): RouteFactory
     {
+        foreach ($middleware as $value) {
+            if ($value instanceof MiddlewareFactory) {
+                $this->middleware[] = $value;
+            }
+        }
 
         return $this;
     }
+
+    public function applyMiddleware(): RouteFactory
+    {
+        if (isset($this->middleware) && !empty($this->middleware)) {
+            MiddlewareStake::getInstance()->add($this->middleware);
+            MiddlewareStake::getInstance()->handle(Request::getInstance());
+        }
+
+        return $this;
+    }
+
+
 
     /**
      * check this Rout is post method

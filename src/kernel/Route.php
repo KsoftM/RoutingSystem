@@ -88,11 +88,18 @@ class Route
         return null;
     }
 
+    public static function currentRoutCheck(string  $routeName): bool
+    {
+        return Route::getPathByName($routeName) == self::urlPath();
+    }
+
     public static function build(): mixed
     {
         $r = Route::resolve();
 
         if ($r != false) {
+            $r->applyMiddleware();
+
             $callable = $r->getCallback();
 
             $call = new ReflectionObject($callable);
@@ -128,16 +135,20 @@ class Route
         return false;
     }
 
-    public static function resolve(): RouteFactory|false
+    protected static function urlPath(): string
     {
-        $url = rtrim(filter_var(
+        return rtrim(filter_var(
             parse_url(
                 filter_input(INPUT_SERVER, 'REQUEST_URI'),
                 PHP_URL_PATH
             ),
             FILTER_SANITIZE_URL
         ), '/') ?: '/';
+    }
 
+    public static function resolve(): RouteFactory|false
+    {
+        $url = self::urlPath();
 
         foreach (self::$argus as $arKey => $arValue) {
             if ($arValue instanceof RouteFactory && ($arValue->isGet() || $arValue->isPost())) {
@@ -206,6 +217,6 @@ class Route
                 $path = implode($value, explode('%s', $path, 2));
             }
         }
-        return $path;
+        return $path ?? false;
     }
 }

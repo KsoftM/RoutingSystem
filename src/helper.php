@@ -1,5 +1,7 @@
 <?php
 
+namespace ksoftm\system;
+
 use ksoftm\system\kernel\Response;
 use ksoftm\system\kernel\Route;
 use ksoftm\system\utils\io\FileManager;
