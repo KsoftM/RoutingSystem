@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "php": "^8.0",
-        "ksoftm/utility": "0.1.1"
+        "ksoftm/utility": "^0.1.5"
     },
     "license": "MIT",
     "authors": [
@@ -19,5 +19,5 @@
             "ksoftm\\system\\": "./src"
         }
     },
-    "version": "0.1.4"
+    "version": "0.1.5"
 }
