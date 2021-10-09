@@ -177,7 +177,8 @@ class Response extends SingletonFactory
 
         Response::make("
             <h1 style=\"
-            
+                margin: 0;
+                padding: 0;
                 font-size: xxx-large;
                 height: 100%;
                 display: grid;

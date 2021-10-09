@@ -6,7 +6,7 @@ use ksoftm\system\utils\Session;
 
 class Redirect
 {
-    public const REDIRECT_KEY = 'redirect_back';
+    public const REDIRECT_KEY = 'redirect';
     /**
      * Class constructor.
      */
@@ -20,9 +20,9 @@ class Redirect
         Session::flash(self::REDIRECT_KEY, filter_input(INPUT_SERVER, 'REQUEST_URI'));
     }
 
-    public static function next(string $routeName, int $responseCode = 303): void
+    public static function next(string $routeName, array $data = null, int $responseCode = 303): void
     {
-        $path = Route::realPath($routeName);
+        $path = Route::realPath($routeName, $data);
         if (!empty($path) && $path != false) {
             Response::make()
                 ->setStateCode($responseCode)

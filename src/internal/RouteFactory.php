@@ -4,10 +4,10 @@ namespace ksoftm\system\internal;
 
 use Closure;
 use Exception;
-use ksoftm\system\kernel\Request;
 use ksoftm\system\kernel\Route;
-use ksoftm\system\middleware\MiddlewareFactory;
+use ksoftm\system\kernel\Request;
 use ksoftm\system\middleware\MiddlewareStake;
+use ksoftm\system\middleware\MiddlewareFactory;
 
 class RouteFactory
 {
@@ -21,8 +21,8 @@ class RouteFactory
     /** @var string $path path of the rout. */
     protected ?string $path = null;
 
-    /** @var Closure $callback callback of the rout. */
-    protected ?Closure $callback = null;
+    /** @var mixed $callback callback of the rout. */
+    protected mixed $callback;
 
     /** @var array $middleware middleware of the rout. */
     protected ?array $middleware = null;
@@ -34,17 +34,17 @@ class RouteFactory
      * class construct
      *
      * @param string $routPath
-     * @param Closure $callback
+     * @param mixed $callback
      * @param string $name
      */
-    protected function __construct(string $path, Closure $callback, string $method)
+    protected function __construct(string $path, mixed $callback, string $method)
     {
         $this->path = $path;
         $this->callback = $callback;
         $this->method = $method;
     }
 
-    public static function new(string $path, Closure $callback, string $method): RouteFactory
+    public static function new(string $path, mixed $callback, string $method): RouteFactory
     {
         return new RouteFactory($path, $callback, $method);
     }
@@ -143,9 +143,9 @@ class RouteFactory
     /**
      * get the callback of the rout
      *
-     * @return Closure|false
+     * @return mixed
      */
-    public function getCallback(): Closure|false
+    public function getCallback(): mixed
     {
         return $this->callback ?? false;
     }

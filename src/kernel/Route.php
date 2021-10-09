@@ -3,10 +3,13 @@
 namespace ksoftm\system\kernel;
 
 use Closure;
-use ksoftm\system\internal\RouteFactory;
-use ksoftm\system\utils\html\Mixer;
-use ksoftm\system\utils\SingletonFactory;
+use DOMParentNode;
+use Exception;
 use ReflectionObject;
+use ksoftm\system\internal\RouteFactory;
+use ksoftm\system\utils\SingletonFactory;
+use ReflectionClass;
+use ReflectionMethod;
 
 class Route
 {
@@ -18,7 +21,7 @@ class Route
     public const POST_METHOD = 'post';
 
     /** @var array $argus routing list. */
-    protected static $argus = [];
+    protected static array $argus = [];
 
     /**
      * example Paths
@@ -44,7 +47,7 @@ class Route
      */
 
 
-    public static function post(string $rout, Closure $callable): RouteFactory
+    public static function post(string $rout, mixed $callable): RouteFactory
     {
         $tmp = RouteFactory::new(
             $rout,
@@ -55,7 +58,7 @@ class Route
         return self::$argus[] = $tmp;
     }
 
-    public static function get(string $rout, Closure $callable): RouteFactory
+    public static function get(string $rout, mixed $callable): RouteFactory
     {
         $tmp = RouteFactory::new(
             $rout,
@@ -93,7 +96,7 @@ class Route
         return Route::getPathByName($routeName) == self::urlPath();
     }
 
-    public static function build(): mixed
+    public static function build(): void
     {
         $r = Route::resolve();
 
@@ -101,38 +104,79 @@ class Route
             $r->applyMiddleware();
 
             $callable = $r->getCallback();
-
-            $call = new ReflectionObject($callable);
-
             $params = [];
-            foreach ($call->getMethod('__invoke')->getParameters() as $key => $value) {
+
+            if (is_array($callable) && count($callable) == 2) {
+                if (
+                    class_exists($callable[0]) &&
+                    method_exists($callable[0], $callable[1])
+                ) {
+                    $call = new ReflectionClass($callable[0]);
+                    $parmData = $call->getMethod($callable[1])->getParameters();
+
+                    if ($call->hasMethod('__construct')) {
+                        if (
+                            $call->getMethod('__construct')->getModifiers() == ReflectionMethod::IS_PUBLIC
+                        ) {
+                            $callable[0] = new $callable[0];
+                        } else {
+                            throw new Exception("Invalid method used in the " . Route::class . " method callback functions!");
+                        }
+                    } else {
+                        $callable[0] = new $callable[0];
+                    }
+                } else {
+                    throw new Exception("Callback function of the " . Rout::class . " is invalid.");
+                }
+            } elseif ($callable instanceof Closure || class_exists($callable)) {
+                $call = new ReflectionObject($callable);
+                if ($call->hasMethod('__invoke')) {
+                    $parmData = $call->getMethod('__invoke')->getParameters();
+                }
+            }
+
+            foreach ($parmData ?? [] as $value) {
+
                 if ($value->hasType()) {
                     $param = $value->getType()->getName();
 
-                    if (isset(class_parents($param)[SingletonFactory::class])) {
-                        $params[] = $param::getInstance();
+                    if (class_exists($param)) {
+                        $call = new ReflectionClass($param);
+
+                        if (is_subclass_of($param, SingletonFactory::class)) {
+                            $params[] = $param::getInstance();
+                        } elseif ($call->hasMethod('__construct')) {
+                            $call = $call->getMethod('__construct');
+                            if ($call->getModifiers() == ReflectionMethod::IS_PUBLIC) {
+                                $params[] = new $param;
+                            } else {
+                                throw new Exception("Invalid method used in the " . Route::class . " method callback functions!");
+                            }
+                        } else {
+                            $params[] = new $param;
+                        }
+                    } else {
+                        throw new Exception("Invalid parameter type used in the " . Route::class . " method callback functions!");
                     }
+                } else {
+                    throw new Exception("parameter datatype must be specified in the " . Route::class . " method callback functions!");
                 }
             }
 
-            if (is_callable($callable)) {
+            if (is_callable($callable) || is_array($callable)) {
                 $data = call_user_func_array($callable, $params);
-                if (
-                    is_object($data) ||
-                    is_array($data)
-                ) {
-                    return $data;
-                } else {
-                    echo $data;
-                    return true;
-                }
+            } elseif (is_string($callable)) {
+                $data = $callable;
+            } else {
+                $data = false;
+            }
+
+            if ($data != false && is_string($data)) {
+                echo $data;
             }
         } else {
             Response::centeredMessage('Rout not found..!');
-            return false;
         }
-
-        return false;
     }
 
     protected static function urlPath(): string

@@ -1,4 +1,4 @@
-/vendor/
+vendor
 .git
 .vscode
-/test/
+test
