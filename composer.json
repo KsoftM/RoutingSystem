@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "php": "^8.0",
-        "ksoftm/utility": "^0.1.7"
+        "ksoftm/utility": "^0.1.10"
     },
     "license": "MIT",
     "authors": [
@@ -15,9 +15,12 @@
     ],
     "minimum-stability": "stable",
     "autoload": {
+        "files": [
+            "./src/helper.php"
+        ],
         "psr-4": {
             "ksoftm\\system\\": "./src"
         }
     },
-    "version": "0.1.7"
+    "version": "0.1.8"
 }

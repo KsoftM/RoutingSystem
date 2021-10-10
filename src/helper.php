@@ -1,7 +1,5 @@
 <?php
 
-namespace ksoftm\system;
-
 use ksoftm\system\kernel\Route;
 use ksoftm\system\kernel\Response;
 use ksoftm\system\utils\io\FileManager;
@@ -25,7 +23,7 @@ if (!function_exists('redirect')) {
 if (!function_exists('request_dir')) {
     function request_dir(string $dir): array
     {
-        $f = new FileManager($dir);
+        $f = FileManager::new($dir);
         $output = [];
         if ($f->isExist()) {
             $f = $f->getDirectoryFiles(true);

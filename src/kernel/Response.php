@@ -175,7 +175,7 @@ class Response extends SingletonFactory
     {
         $message = $message ?? 'File Not Found..!';
 
-        Response::make("
+        return Response::make("
             <h1 style=\"
                 margin: 0;
                 padding: 0;
@@ -187,12 +187,10 @@ class Response extends SingletonFactory
                 justify-content: center;
                 align-content: center;
                 justify-items: center;
-                
+                color: #565656;
                 \">
                 $message
             </h1>
             ", $responseCode);
-
-        return Response::make();
     }
 }
