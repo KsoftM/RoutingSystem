@@ -3,13 +3,12 @@
 namespace ksoftm\system\kernel;
 
 use Closure;
-use DOMParentNode;
 use Exception;
+use ReflectionClass;
+use ReflectionMethod;
 use ReflectionObject;
 use ksoftm\system\internal\RouteFactory;
 use ksoftm\system\utils\SingletonFactory;
-use ReflectionClass;
-use ReflectionMethod;
 
 class Route
 {
