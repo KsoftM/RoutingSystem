@@ -23,7 +23,7 @@ if (!function_exists('redirect')) {
 if (!function_exists('request_dir')) {
     function request_dir(string $dir): array
     {
-        $f = FileManager::new($dir);
+        $f = FileManager::path($dir);
         $output = [];
         if ($f->isExist()) {
             $f = $f->getDirectoryFiles(true);

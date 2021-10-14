@@ -40,10 +40,6 @@ class Route
      * $routers = '/user/{0}/quest/{1}';
      * $routers = '/user/{0}';
      * 
-     * compare routers to match the path
-     * 
-     * preg_match('/[\/]user\/(.*)\/profile\/edit\/slug[\/](.*)/', $input_line, $output_array);
-     * 
      */
 
 
