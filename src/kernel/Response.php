@@ -121,10 +121,12 @@ class Response extends SingletonFactory
         return $this;
     }
 
-    public function view(string $path, array $data = []): void
+    public function view(string $path, array $data = []): Response
     {
         $c = new View();
         echo $c->view($path, $data);
+
+        return $this;
     }
 
     public function acceptHtml(string $charset = 'UTF-8'): Response
