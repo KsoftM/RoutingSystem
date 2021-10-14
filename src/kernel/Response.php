@@ -4,6 +4,7 @@ namespace ksoftm\system\kernel;
 
 use ksoftm\system\utils\Cookie;
 use ksoftm\system\utils\SingletonFactory;
+use ksoftm\system\utils\View;
 
 class Response extends SingletonFactory
 {
@@ -118,6 +119,12 @@ class Response extends SingletonFactory
         $this->data->start();
 
         return $this;
+    }
+
+    public function view(string $path, array $data = []): void
+    {
+        $c = new View();
+        echo $c->view($path, $data);
     }
 
     public function acceptHtml(string $charset = 'UTF-8'): Response
