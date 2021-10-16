@@ -3,6 +3,7 @@
 namespace ksoftm\system\kernel;
 
 use ksoftm\system\utils\Cookie;
+use ksoftm\system\utils\io\FileManager;
 use ksoftm\system\utils\SingletonFactory;
 use ksoftm\system\utils\View;
 
@@ -146,13 +147,13 @@ class Response extends SingletonFactory
 
     public function download(string $filePath): void
     {
-        if (file_exists($filePath)) {
+        $f = new FileManager($filePath);
+
+        if ($f->isExist()) {
             Response::make()->withHeader([
                 "Cache-Control: public",
                 "Content-Description: File Transfer",
                 "Cache-Control: no-cash, must-revalidate",
-                //Expires: Thu, 19 Nov 1981 08:52:00 GMT
-                // "Expires: 0",
                 "Content-Disposition: attachment; filename=" . pathinfo($filePath, PATHINFO_BASENAME),
                 // "Content-Type: application/octet-stream",
                 "Content-Type: application/" . pathinfo($filePath, PATHINFO_EXTENSION) ?? 'docx',
@@ -164,15 +165,8 @@ class Response extends SingletonFactory
                 ob_end_clean();
             }
 
-            $ctx = stream_context_create();
-
-            if (false !== ($fRes = fopen($filePath, 'r', context: $ctx))) {
-
-                while (false !== ($d = stream_get_contents($fRes, 512 * 1024))) {
-                    echo $d;
-                }
-                exit;
-            }
+            $f->readStream();
+            exit;
         }
 
         $this->centeredMessage('File Not Found..!', 404);

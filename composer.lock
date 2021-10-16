@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a3752e5567253c390d44e2a3b0adabc",
+    "content-hash": "3cf06611ae574202f86ef9fa6ec5695b",
     "packages": [
         {
             "name": "ksoftm/utility",
-            "version": "0.1.16",
+            "version": "0.1.17",
             "dist": {
                 "type": "path",
                 "url": "./../Utility",
-                "reference": "ca5014b44f32a8c9eafe33f54e67631a24327a3e"
+                "reference": "9863a18da8d1a174a96369054a17475fffe977d2"
             },
             "require": {
                 "php": "^8.0"

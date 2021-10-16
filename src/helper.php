@@ -4,10 +4,10 @@ use ksoftm\system\kernel\Route;
 use ksoftm\system\kernel\Response;
 use ksoftm\system\utils\io\FileManager;
 
-if (!function_exists('router')) {
-    function router(string $name): string
+if (!function_exists('route')) {
+    function route(string $name, array $data = []): string
     {
-        return Route::realpath($name);
+        return Route::realpath($name, $data);
     }
 }
 

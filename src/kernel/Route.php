@@ -250,10 +250,11 @@ class Route
             }
             $path = "$path/";
             foreach ($matches[1] as $value) {
-                $path = str_replace(sprintf("{%s}", $value), '%s', $path);
-            }
-            foreach ($data as $value) {
-                $path = implode($value, explode('%s', $path, 2));
+                if (array_key_exists($value, $data)) {
+                    $path = str_replace(sprintf("{%s}", $value), $data[$value], $path);
+                } else {
+                    return false;
+                }
             }
         }
         return $path ?? false;
