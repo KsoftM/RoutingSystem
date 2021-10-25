@@ -17,7 +17,7 @@ class Redirect
 
     public static function init(): void
     {
-        Session::flash(self::REDIRECT_KEY, filter_input(INPUT_SERVER, 'REQUEST_URI'));
+        Session::new()->flash(self::REDIRECT_KEY, filter_input(INPUT_SERVER, 'REQUEST_URI'));
     }
 
     public static function next(string $routeName, array $data = null, int $responseCode = 303): void
@@ -33,7 +33,7 @@ class Redirect
 
     public static function back(string $default = '/', int $responseCode = 303): void
     {
-        $path = Session::getOnce(self::REDIRECT_KEY, $default);
+        $path = Session::new()->getOnceByKey(self::REDIRECT_KEY, $default);
 
         if (!empty($path)) {
             Response::make()
