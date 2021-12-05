@@ -42,4 +42,10 @@ class Redirect
             exit;
         }
     }
+
+    public static function reload(): void
+    {
+        $url = filter_input(INPUT_SERVER, 'REQUEST_URI');
+        Response::make()->header("Location", $url);
+    }
 }

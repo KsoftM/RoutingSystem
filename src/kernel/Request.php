@@ -33,7 +33,7 @@ class Request extends SingletonFactory
 
         foreach ($data as $key => $value) {
             $key = filter_var($key, FILTER_SANITIZE_SPECIAL_CHARS);
-            $tmp[$key] = filter_input($method, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+            $tmp[$key] = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
         }
 
         return $tmp ?? false;
@@ -83,6 +83,17 @@ class Request extends SingletonFactory
         return $tmp ?? false;
     }
 
+    public function __get(string $data)
+    {
+        $all = $this->getAll();
+
+        if (array_key_exists($data, $all)) {
+            return $all[$data];
+        }
+
+        return null;
+    }
+
     public function userRouterData(): array|false
     {
         $r = Route::resolve();
@@ -91,6 +102,24 @@ class Request extends SingletonFactory
             return $r->getUserPathData();
         }
 
+        return false;
+    }
+
+    public function isGetMethod(): bool
+    {
+        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
+        if ($method == 'GET') {
+            return true;
+        }
+        return false;
+    }
+
+    public function isPostMethod(): bool
+    {
+        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
+        if ($method != 'GET') {
+            return true;
+        }
         return false;
     }
 }

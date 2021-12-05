@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "034f5abd81c1a1ffaf3ef8ba7e17c22b",
+    "content-hash": "839ccf41bb8fccfa399c0d6023804f96",
     "packages": [
         {
             "name": "ksoftm/utility",
-            "version": "0.1.23",
+            "version": "0.1.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KsoftM/Utility.git",
-                "reference": "347e4ebe9de8bc2a88fdc7bb13e2fb7807a80541"
+                "reference": "e45ef58a154a502317dcdd29e7b6db4248419a76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KsoftM/Utility/zipball/347e4ebe9de8bc2a88fdc7bb13e2fb7807a80541",
-                "reference": "347e4ebe9de8bc2a88fdc7bb13e2fb7807a80541",
+                "url": "https://api.github.com/repos/KsoftM/Utility/zipball/e45ef58a154a502317dcdd29e7b6db4248419a76",
+                "reference": "e45ef58a154a502317dcdd29e7b6db4248419a76",
                 "shasum": ""
             },
             "require": {
@@ -42,9 +42,9 @@
             "description": "Some utility helpers for PHP.",
             "support": {
                 "issues": "https://github.com/KsoftM/Utility/issues",
-                "source": "https://github.com/KsoftM/Utility/tree/v0.1.23"
+                "source": "https://github.com/KsoftM/Utility/tree/v0.1.27"
             },
-            "time": "2021-10-25T06:44:31+00:00"
+            "time": "2021-12-05T07:42:11+00:00"
         }
     ],
     "packages-dev": [],
