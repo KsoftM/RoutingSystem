@@ -133,7 +133,7 @@ class RouteFactory
     /**
      * get the path of the rout
      *
-     * @return void
+     * @return ?string
      */
     public function getPath(): ?string
     {
