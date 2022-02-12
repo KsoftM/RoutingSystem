@@ -2,6 +2,7 @@
 
 namespace ksoftm\system\kernel;
 
+use ksoftm\system\utils\datatype\Dictionary;
 use ksoftm\system\utils\SingletonFactory;
 
 /*
@@ -17,6 +18,9 @@ use ksoftm\system\utils\SingletonFactory;
  */
 class Request extends SingletonFactory
 {
+    /** @var Dictionary $args globlal variable data arguments. */
+    protected Dictionary $args;
+
     protected static ?self $instance = null;
     public static function getInstance(): self
     {
@@ -26,14 +30,53 @@ class Request extends SingletonFactory
         return self::$instance;
     }
 
-    public function getMethodData(string $method = Route::GET_METHOD): array|false
+    /**
+     * Class constructor.
+     */
+    public function __construct()
     {
-        $data = ($method == Route::GET_METHOD) ? $_GET : $_POST;
-        $method = ($method == Route::GET_METHOD) ? INPUT_GET : INPUT_POST;
+        if (empty($this->args)) {
+            $this->args = new Dictionary();
+            $this->loadData();
+        }
+    }
 
-        foreach ($data as $key => $value) {
-            $key = filter_var($key, FILTER_SANITIZE_SPECIAL_CHARS);
-            $tmp[$key] = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+    public function getMethodData(string $method = Route::GET_METHOD): Dictionary|false
+    {
+        // todo add more methdo like get post cookie session files route
+        $data = false;
+
+        switch (strtolower($method)) {
+            case 'get':
+                $data = $_GET;
+                break;
+            case 'post':
+                $data = $_POST;
+                break;
+            case 'cookie':
+                $data = $_COOKIE;
+                break;
+            case 'session':
+                $data = $_SESSION;
+                break;
+            case 'files':
+                $data = $_FILES;
+                break;
+            case 'route':
+                $data = $this->userRouterData();
+                break;
+
+            default:
+                $data = false;
+                break;
+        }
+
+        if ($data != false) {
+            $tmp = new Dictionary();
+            foreach ($data as $key => $value) {
+                $key = filter_var($key, FILTER_SANITIZE_SPECIAL_CHARS);
+                $tmp->add($key, filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS));
+            }
         }
 
         return $tmp ?? false;
@@ -46,49 +89,62 @@ class Request extends SingletonFactory
 
     public function except(array $keys): array|false
     {
-        $data = $this->getAll();
+        // $this->loadData();
 
-        if ($data != false && !empty($data)) {
+        if ($this->args != false) {
             $tmp = null;
 
             foreach ($keys as $eKey) {
-                if (array_key_exists($eKey, $data)) {
-                    $tmp[$eKey] = $data[$eKey];
-                }
+                $tmp = $this->args->getEach(function (string $key, Dictionary $d) use ($eKey) {
+                    if ($d->haveKey($eKey)) {
+                        return $d->getKey($eKey);
+                    }
+                });
             }
         }
 
         return $tmp ?? false;
     }
 
-    public function getAll(): array|false
+    public function getAll(): Dictionary|false
     {
         if (session_status() != PHP_SESSION_ACTIVE) {
             session_start();
         }
 
-        $output = array_merge(
-            $_GET,
-            $_POST,
-            $_COOKIE,
-            $_SESSION,
-            $_FILES
-        );
+        $tmp = $this->getMethodData('get');
+        $this->args->add("get", $tmp == false ? new Dictionary() : $tmp);
 
-        foreach ($output as $key => $value) {
-            $key = filter_var($key, FILTER_SANITIZE_SPECIAL_CHARS);
-            $tmp[$key] = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
-        }
+        $tmp = $this->getMethodData('post');
+        $this->args->add("post", $tmp == false ? new Dictionary() : $tmp);
 
-        return $tmp ?? false;
+        $tmp = $this->getMethodData('cookie');
+        $this->args->add("cookie", $tmp == false ? new Dictionary() : $tmp);
+
+        $tmp = $this->getMethodData('session');
+        $this->args->add("session", $tmp == false ? new Dictionary() : $tmp);
+
+        $tmp = $this->getMethodData('files');
+        $this->args->add("files", $tmp == false ? new Dictionary() : $tmp);
+
+        $tmp = $this->getMethodData('route');
+        $this->args->add("route", $tmp == false ? new Dictionary() : $tmp);
+
+
+        return $this->args ?? false;
+    }
+
+    public function loadData(): void
+    {
+        $this->args = $this->getAll();
     }
 
     public function __get(string $data)
     {
-        $all = $this->getAll();
+        // $this->loadData();
 
-        if (array_key_exists($data, $all)) {
-            return $all[$data];
+        if ($this->args->haveKey($data)) {
+            return $this->args->$data;
         }
 
         return null;
@@ -107,19 +163,16 @@ class Request extends SingletonFactory
 
     public function isGetMethod(): bool
     {
-        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
-        if ($method == 'GET') {
-            return true;
-        }
-        return false;
+        return $this->currentMethod()  == 'get' ? true : false;
     }
 
     public function isPostMethod(): bool
     {
-        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
-        if ($method != 'GET') {
-            return true;
-        }
-        return false;
+        return $this->currentMethod()  == 'post' ? true : false;
+    }
+
+    public function currentMethod(): string
+    {
+        return strtolower(filter_input(INPUT_SERVER, 'REQUEST_METHOD'));
     }
 }
