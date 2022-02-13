@@ -84,7 +84,21 @@ class Request extends SingletonFactory
 
     public function exists(string $key): bool
     {
-        return  is_array($this->except([$key])) && $this->except([$key]) != false ? true : false;
+        if (strpos($key, '.')) {
+            $key = explode('.', $key);
+            $d = $this;
+            foreach ($key as $value) {
+                $d = $d->$value;
+            }
+
+            return empty($d) ? false : true;
+        } else {
+            return empty($this->$key) ? false : true;
+        }
+        return
+            is_array($this->except([$key])) &&
+            $this->except([$key]) != false &&
+            !is_null($this->post) ? true : false;
     }
 
     public function except(array $keys): array|false
